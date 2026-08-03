@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_auth"
-    tools:context=".LoginFragment">
+    tools:context=".activities.LoginActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,7 +29,8 @@
                 android:layout_width="130dp"
                 android:layout_height="130dp"
                 android:src="@drawable/logo_mealdb"
-                android:scaleType="fitCenter"/>
+                android:scaleType="fitCenter"
+                android:contentDescription="App Logo"/>
 
             <TextView
                 android:layout_width="wrap_content"
