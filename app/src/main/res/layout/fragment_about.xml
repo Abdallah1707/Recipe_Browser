@@ -99,7 +99,7 @@
                         <ImageView
                             android:layout_width="90dp"
                             android:layout_height="90dp"
-                            android:src="@drawable/member1"
+                            android:src="@drawable/member"
                             android:scaleType="centerCrop"/>
 
                         <TextView
@@ -130,7 +130,7 @@
                         <ImageView
                             android:layout_width="90dp"
                             android:layout_height="90dp"
-                            android:src="@drawable/member2"
+                            android:src="@drawable/member"
                             android:scaleType="centerCrop"/>
 
                         <TextView
@@ -161,7 +161,7 @@
                         <ImageView
                             android:layout_width="90dp"
                             android:layout_height="90dp"
-                            android:src="@drawable/member3"
+                            android:src="@drawable/member"
                             android:scaleType="centerCrop"/>
 
                         <TextView
@@ -192,7 +192,7 @@
                         <ImageView
                             android:layout_width="90dp"
                             android:layout_height="90dp"
-                            android:src="@drawable/member4"
+                            android:src="@drawable/member"
                             android:scaleType="centerCrop"/>
 
                         <TextView
