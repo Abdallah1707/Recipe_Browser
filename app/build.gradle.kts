@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.ksp)
+
 }
 
 android {
@@ -38,6 +40,18 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
+
+    //retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.recycleView)
+    implementation(libs.logging.interceptor)
+
+    ksp(libs.room.compiler)
+    implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.fragment.ktx)
+    implementation(libs.glide)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
