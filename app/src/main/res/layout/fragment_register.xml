@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_auth"
-    tools:context=".ui.auth.RegisterFragment">
+    tools:context=".RegisterFragment">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -71,7 +71,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        app:boxBackgroundMode="outlined"
+                        app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="16dp"
                         app:boxCornerRadiusTopEnd="16dp"
                         app:boxCornerRadiusBottomStart="16dp"
@@ -97,7 +97,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         app:startIconDrawable="@drawable/ic_email"
-                        app:boxBackgroundMode="outlined"
+                        app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="16dp"
                         app:boxCornerRadiusTopEnd="16dp"
                         app:boxCornerRadiusBottomStart="16dp"
@@ -125,7 +125,7 @@
                         android:layout_marginTop="8dp"
                         app:startIconDrawable="@drawable/ic_lock"
                         app:endIconMode="password_toggle"
-                        app:boxBackgroundMode="outlined"
+                        app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="16dp"
                         app:boxCornerRadiusTopEnd="16dp"
                         app:boxCornerRadiusBottomStart="16dp"
@@ -150,7 +150,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        app:boxBackgroundMode="outlined"
+                        app:boxBackgroundMode="outline"
                         app:boxCornerRadiusTopStart="16dp"
                         app:boxCornerRadiusTopEnd="16dp"
                         app:boxCornerRadiusBottomStart="16dp"
