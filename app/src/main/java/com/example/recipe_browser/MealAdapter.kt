@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.recipe_browser.model.Meal
 
-class MealAdapter(private val meals: List<Meal>) :
-    RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
+class MealAdapter(
+    private val meals: List<Meal>,
+    private val onItemClick: (Meal) -> Unit
+) : RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
 
     class MealViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
@@ -31,6 +33,8 @@ class MealAdapter(private val meals: List<Meal>) :
         Glide.with(holder.itemView.context)
             .load(meal.strMealThumb)
             .into(holder.imageView)
+
+        holder.itemView.setOnClickListener { onItemClick(meal) }
     }
 
     override fun getItemCount(): Int = meals.size

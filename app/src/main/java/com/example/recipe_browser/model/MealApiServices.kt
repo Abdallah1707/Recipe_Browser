@@ -14,6 +14,9 @@ interface MealApiService {
 
     @GET("random.php")
     suspend fun getRandomMeal(): MealResponse
+
+    @GET("search.php")
+    suspend fun getMealsByLetter(@Query("f") letter: String): MealResponse
 }
 
 val retrofit: Retrofit = Retrofit.Builder()
