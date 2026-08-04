@@ -44,7 +44,7 @@ class RegisterActivity : AppCompatActivity() {
             when (result) {
                 is RegisterViewModel.RegisterResult.Success -> {
                     Toast.makeText(this, "Registration successful", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, MainActivity::class.java))
+                    startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                 }
                 is RegisterViewModel.RegisterResult.Error -> {

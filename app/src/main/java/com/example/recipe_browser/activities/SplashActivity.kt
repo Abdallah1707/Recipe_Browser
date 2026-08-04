@@ -23,7 +23,7 @@ class SplashActivity : AppCompatActivity() {
         val isLoggedIn = sharedPref.getBoolean("isLoggedIn", false)
 
         if (isLoggedIn) {
-            startActivity(Intent(this, MainActivity::class.java))
+            startActivity(Intent(this, HomeActivity::class.java))
         } else {
             startActivity(Intent(this, LoginActivity::class.java))
         }

@@ -15,14 +15,14 @@ class MealAdapter(
 ) : RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
 
     class MealViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageView)
-        val textView: TextView = itemView.findViewById(R.id.textView)
-        val textView2: TextView = itemView.findViewById(R.id.textView2)
+        val imageView: ImageView = itemView.findViewById(R.id.imgRecent)
+        val textView: TextView = itemView.findViewById(R.id.txtRecentName)
+        val textView2: TextView = itemView.findViewById(R.id.txtRecentTime)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.single_recipe, parent, false)
+            .inflate(R.layout.item_recent_recipe, parent, false)
         return MealViewHolder(view)
     }
 

@@ -35,7 +35,7 @@ class LoginActivity : AppCompatActivity() {
         viewModel.loginStatus.observe(this) { result ->
             when (result) {
                 is LoginViewModel.LoginResult.Success -> {
-                    startActivity(Intent(this, MainActivity::class.java))
+                    startActivity(Intent(this, HomeActivity::class.java))
                     finish()
                 }
                 is LoginViewModel.LoginResult.Error -> {
