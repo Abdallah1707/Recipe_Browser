@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.recipe_browser.model.Meal
 import com.example.recipe_browser.model.mealApiServices
 import kotlinx.coroutines.launch
 
@@ -27,12 +28,18 @@ class RecipesFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         lifecycleScope.launch {
-            try {
-                val response = mealApiServices.searchMeal("chicken")
-                val meals = response.meals ?: emptyList()
-                recyclerView.adapter = MealAdapter(meals)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val allMeals = mutableListOf<Meal>()
+
+            for (letter in 'a'..'z') {
+                try {
+                    val response = mealApiServices.getMealsByLetter(letter.toString())
+                    response.meals?.let { allMeals.addAll(it) }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+
+            recyclerView.adapter = MealAdapter(allMeals) { meal -> R.layout.fragment_recipe_detail
             }
         }
     }
