@@ -67,7 +67,7 @@
                 android:id="@+id/txtHello"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello Ahmed 👋"
+                android:text="Hello, 👋"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="#222222"/>
@@ -183,7 +183,7 @@
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingEnd="8dp"
-                tools:listitem="@layout/item_category"/>
+                tools:listitem="@layout/item_category" />
 
             <LinearLayout
                 android:layout_width="match_parent"
