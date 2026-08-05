@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -33,6 +34,11 @@ class UserFragment : Fragment() {
         val tvAge = view.findViewById<TextView>(R.id.tvAge)
         val tvCountry = view.findViewById<TextView>(R.id.tvCountry)
         val btnLogout = view.findViewById<Button>(R.id.btnLogout)
+        val btnBack = view.findViewById<ImageView>(R.id.btnBack)
+
+        btnBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
 
         val sharedPref = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
         val userEmail = sharedPref.getString("userEmail", null)
