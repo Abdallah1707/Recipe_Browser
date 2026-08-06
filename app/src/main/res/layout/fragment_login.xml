@@ -86,7 +86,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Enter your email"
-                            android:inputType="textEmailAddress"/>
+                            android:inputType="textEmailAddress"
+                            android:textColor="#212121"
+                            android:textColorHint="#9E9E9E"/>
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -95,8 +97,9 @@
                         android:layout_height="wrap_content"
                         android:text="Password"
                         android:textStyle="bold"
-                        android:textColor="#222222"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_marginTop="20dp"
+                        android:textColor="#212121"
+                        android:textColorHint="#9E9E9E"/>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:layout_width="match_parent"

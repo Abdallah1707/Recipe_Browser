@@ -24,13 +24,27 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="60dp"
         android:background="@android:color/transparent"
+        android:paddingEnd="20dp"
         app:title=""
-        app:navigationIcon="@drawable/ic_menu"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imgProfileToolbar"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/circle_background"
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile"/>
+
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
@@ -52,7 +66,7 @@
                 android:id="@+id/txtHello"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hello Ahmed 👋"
+                android:text="Hello, 👋"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="#222222"/>
@@ -168,7 +182,7 @@
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:paddingEnd="8dp"
-                tools:listitem="@layout/item_category"/>
+                tools:listitem="@layout/item_category" />
 
             <LinearLayout
                 android:layout_width="match_parent"

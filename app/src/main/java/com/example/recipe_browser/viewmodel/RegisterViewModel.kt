@@ -17,8 +17,8 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
     private val _registerStatus = MutableLiveData<RegisterResult>()
     val registerStatus: LiveData<RegisterResult> = _registerStatus
 
-    fun register(name: String, email: String, password: String, confirmPass: String) {
-        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty()) {
+    fun register(name: String, email: String, password: String, confirmPass: String, phone: String, age: String, country: String) {
+        if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPass.isEmpty() || phone.isEmpty() || age.isEmpty() || country.isEmpty()) {
             _registerStatus.value = RegisterResult.Error("Please fill all fields")
             return
         }
@@ -38,7 +38,7 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
                     return@launch
                 }
 
-                val newUser = User(email, name, password)
+                val newUser = User(email, name, password, phone, age, country)
                 db.userDao().registerUser(newUser)
                 
                 with(sharedPref.edit()) {
