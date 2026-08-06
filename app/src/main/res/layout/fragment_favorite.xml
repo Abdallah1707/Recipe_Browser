@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:alpha="0.18"
         android:scaleType="centerCrop"
-        android:src="@drawable/bg_home"/>
+        android:src="@drawable/banner_food"/>
 
     <View
         android:layout_width="match_parent"
@@ -24,7 +24,9 @@
         android:id="@+id/toolbar"
         android:layout_width="0dp"
         android:layout_height="60dp"
+        android:layout_marginTop="16dp"
         android:background="@android:color/transparent"
+        android:paddingEnd="20dp"
         app:title="Favorite Recipes ❤️"
         app:titleTextColor="#222222"
         app:layout_constraintTop_toTopOf="parent"
