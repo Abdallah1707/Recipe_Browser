@@ -17,4 +17,7 @@ class MealRepository {
     suspend fun getCategories(): List<Category> {
         return RetrofitClient.api.getCategories().categories
     }
+    suspend fun searchMeals(name: String): List<Meal> {
+        return RetrofitClient.api.searchMeal(name).meals ?: emptyList()
+    }
 }
