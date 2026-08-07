@@ -8,11 +8,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
+import com.example.recipe_browser.RecipeRepository
+import com.example.recipe_browser.model.MealApiService
+import com.example.recipe_browser.model.PopularRecipeAdapter
+import com.example.recipe_browser.model.local.database.RecipeDatabase
 import com.example.recipe_browser.room.MealDatabase
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
+import com.example.recipe_browser.model.mealApiServices
 
 class HomeFragment : Fragment() {
 
@@ -77,7 +84,9 @@ class HomeFragment : Fragment() {
         val txtHello = view.findViewById<TextView>(R.id.txtHello)
         val sharedPref = requireActivity().getSharedPreferences("user_prefs", android.content.Context.MODE_PRIVATE)
         val userEmail = sharedPref.getString("userEmail", null)
-
+        val rvPopular = view.findViewById<RecyclerView>(R.id.rvPopular)
+        rvPopular.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         if (userEmail != null) {
             val db = MealDatabase.getDatabase(requireContext())
             lifecycleScope.launch {
@@ -86,8 +95,18 @@ class HomeFragment : Fragment() {
                     if (user != null) {
                         txtHello.text = "Hello, ${user.name} 👋"
                     }
+                    val repository = RecipeRepository(
+                        mealApiServices,
+                        RecipeDatabase.getInstance(requireContext()).recentRecipeDao(),
+                        RecipeDatabase.getInstance(requireContext()).recipeDao(),
+                        RecipeDatabase.getInstance(requireContext()).searchHistoryDao()
+                    )
+
+                    val meals = repository.getPopularRecipes()
+
+                    rvPopular.adapter = PopularRecipeAdapter(meals)
                 } catch (e: Exception) {
-                    // Fail silently
+
                 }
             }
         }
