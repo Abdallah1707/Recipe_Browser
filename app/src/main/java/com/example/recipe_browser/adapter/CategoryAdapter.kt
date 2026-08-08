@@ -11,15 +11,23 @@ import com.example.recipe_browser.R
 import com.example.recipe_browser.model.Category
 
 class CategoryAdapter(
-    private val list: List<Category>
+    private val list: List<Category>,
+    private val onClick: (Category) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imgCategory: ImageView = itemView.findViewById(R.id.imgCategory)
-        val txtCategory: TextView = itemView.findViewById(R.id.txtCategory)
+
+        val imgCategory: ImageView =
+            itemView.findViewById(R.id.imgCategory)
+
+        val txtCategory: TextView =
+            itemView.findViewById(R.id.txtCategory)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): ViewHolder {
 
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_category, parent, false)
@@ -27,7 +35,10 @@ class CategoryAdapter(
         return ViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: ViewHolder,
+        position: Int
+    ) {
 
         val item = list[position]
 
@@ -35,8 +46,15 @@ class CategoryAdapter(
 
         Glide.with(holder.itemView.context)
             .load(item.strCategoryThumb)
+            .placeholder(R.drawable.ic_food)
             .into(holder.imgCategory)
+
+        holder.itemView.setOnClickListener {
+            onClick(item)
+        }
     }
 
-    override fun getItemCount() = list.size
+    override fun getItemCount(): Int {
+        return list.size
+    }
 }

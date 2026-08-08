@@ -20,4 +20,11 @@ class MealRepository {
     suspend fun searchMeals(name: String): List<Meal> {
         return RetrofitClient.api.searchMeal(name).meals ?: emptyList()
     }
+
+    suspend fun getMealsByCategory(category: String): List<Meal> {
+
+        return RetrofitClient.api
+            .filterByCategory(category)
+            .meals ?: emptyList()
+    }
 }

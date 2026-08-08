@@ -69,8 +69,27 @@ class HomeFragment : Fragment() {
 
         viewModel.categories.observe(viewLifecycleOwner) { categories ->
 
-            categoryRecycler.adapter = CategoryAdapter(categories)
+            categoryRecycler.adapter = CategoryAdapter(categories) { category ->
 
+                val searchFragment = SearchFragment()
+
+                val bundle = Bundle()
+
+                bundle.putString(
+                    "category",
+                    category.strCategory
+                )
+
+                searchFragment.arguments = bundle
+
+                parentFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.fragmentContainer,
+                        searchFragment
+                    )
+                    .addToBackStack(null)
+                    .commit()
+            }
         }
 
         viewModel.loadMeals()
