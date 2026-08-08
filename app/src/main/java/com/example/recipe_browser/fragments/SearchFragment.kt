@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.RecentRecipeAdapter
 import com.example.recipe_browser.viewmodel.FavoriteViewModel
+import com.example.recipe_browser.viewmodel.RecentViewModel
 import com.example.recipe_browser.viewmodel.SearchViewModel
 import com.google.android.material.textfield.TextInputEditText
 
@@ -22,6 +23,7 @@ class SearchFragment : Fragment() {
 
     private lateinit var viewModel: SearchViewModel
     private lateinit var favoriteViewModel: FavoriteViewModel
+    private lateinit var recentViewModel: RecentViewModel
 
     private lateinit var etSearch: TextInputEditText
     private lateinit var rvSearch: RecyclerView
@@ -55,6 +57,9 @@ class SearchFragment : Fragment() {
 
         favoriteViewModel =
             ViewModelProvider(this)[FavoriteViewModel::class.java]
+
+        recentViewModel =
+            ViewModelProvider(requireActivity())[RecentViewModel::class.java]
 
         viewModel.meals.observe(viewLifecycleOwner) { meals ->
 
@@ -93,6 +98,10 @@ class SearchFragment : Fragment() {
 
                         onClick = { meal ->
 
+                            // Save as Recent
+                            recentViewModel.addRecent(meal)
+
+                            // Open Details
                             parentFragmentManager
                                 .beginTransaction()
                                 .replace(

@@ -5,15 +5,21 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.recipe_browser.model.FavoriteMeal
+import com.example.recipe_browser.model.RecentMeal
 
 @Database(
-    entities = [FavoriteMeal::class],
-    version = 1,
+    entities = [
+        FavoriteMeal::class,
+        RecentMeal::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun favoriteDao(): FavoriteDao
+
+    abstract fun recentMealDao(): RecentMealDao
 
     companion object {
 

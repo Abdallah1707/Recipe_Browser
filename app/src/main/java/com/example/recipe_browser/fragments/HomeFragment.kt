@@ -12,14 +12,22 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.CategoryAdapter
 import com.example.recipe_browser.adapter.MealAdapter
+import com.example.recipe_browser.adapter.RecentHomeAdapter
+import com.example.recipe_browser.viewmodel.FavoriteViewModel
 import com.example.recipe_browser.viewmodel.HomeViewModel
+import com.example.recipe_browser.viewmodel.RecentViewModel
 
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
+    private lateinit var recentViewModel: RecentViewModel
+    private lateinit var favoriteViewModel: FavoriteViewModel
 
     private lateinit var popularRecycler: RecyclerView
     private lateinit var categoryRecycler: RecyclerView
+    private lateinit var recentRecycler: RecyclerView
+
+    private val favoriteIds = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,69 +35,187 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        val view = inflater.inflate(
+            R.layout.fragment_home,
+            container,
+            false
+        )
 
-        val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
+        val imgProfile =
+            view.findViewById<ImageView>(
+                R.id.imgProfileToolbar
+            )
 
         imgProfile.setOnClickListener {
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, UserFragment())
+            parentFragmentManager
+                .beginTransaction()
+                .replace(
+                    R.id.fragmentContainer,
+                    UserFragment()
+                )
                 .addToBackStack(null)
                 .commit()
-
         }
 
-        popularRecycler = view.findViewById(R.id.rvPopular)
-        categoryRecycler = view.findViewById(R.id.rvCategories)
+        popularRecycler =
+            view.findViewById(R.id.rvPopular)
+
+        categoryRecycler =
+            view.findViewById(R.id.rvCategories)
+
+        recentRecycler =
+            view.findViewById(R.id.rvRecent)
 
         popularRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
 
         categoryRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
 
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        recentRecycler.layoutManager =
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.VERTICAL,
+                false
+            )
 
-        viewModel.meals.observe(viewLifecycleOwner) { meals ->
+        viewModel =
+            ViewModelProvider(this)[HomeViewModel::class.java]
 
-            popularRecycler.adapter = MealAdapter(meals) { meal ->
+        recentViewModel =
+            ViewModelProvider(this)[RecentViewModel::class.java]
 
-                parentFragmentManager.beginTransaction()
-                    .replace(
-                        R.id.fragmentContainer,
-                        DetailsFragment.newInstance(meal.idMeal)
-                    )
-                    .addToBackStack(null)
-                    .commit()
+        favoriteViewModel =
+            ViewModelProvider(this)[FavoriteViewModel::class.java]
 
+        // Favorites from Room
+
+        favoriteViewModel.favorites.observe(
+            viewLifecycleOwner
+        ) { favorites ->
+
+            favoriteIds.clear()
+
+            favoriteIds.addAll(
+                favorites.map {
+                    it.idMeal
+                }
+            )
+
+            recentViewModel.recentMeals.value?.let { recentMeals ->
+
+                recentRecycler.adapter =
+                    RecentHomeAdapter(
+                        meals = recentMeals,
+                        favoriteViewModel = favoriteViewModel,
+                        favoriteIds = favoriteIds
+                    ) { meal ->
+
+                        parentFragmentManager
+                            .beginTransaction()
+                            .replace(
+                                R.id.fragmentContainer,
+                                DetailsFragment.newInstance(
+                                    meal.idMeal
+                                )
+                            )
+                            .addToBackStack(null)
+                            .commit()
+                    }
             }
-
         }
 
-        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+        // Popular Recipes
 
-            categoryRecycler.adapter = CategoryAdapter(categories) { category ->
+        viewModel.meals.observe(
+            viewLifecycleOwner
+        ) { meals ->
 
-                val searchFragment = SearchFragment()
+            popularRecycler.adapter =
+                MealAdapter(meals) { meal ->
 
-                val bundle = Bundle()
+                    recentViewModel.addRecent(meal)
 
-                bundle.putString(
-                    "category",
-                    category.strCategory
-                )
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fragmentContainer,
+                            DetailsFragment.newInstance(
+                                meal.idMeal
+                            )
+                        )
+                        .addToBackStack(null)
+                        .commit()
+                }
+        }
 
-                searchFragment.arguments = bundle
+        // Categories
 
-                parentFragmentManager.beginTransaction()
-                    .replace(
-                        R.id.fragmentContainer,
-                        searchFragment
+        viewModel.categories.observe(
+            viewLifecycleOwner
+        ) { categories ->
+
+            categoryRecycler.adapter =
+                CategoryAdapter(categories) { category ->
+
+                    val searchFragment =
+                        SearchFragment()
+
+                    val bundle =
+                        Bundle()
+
+                    bundle.putString(
+                        "category",
+                        category.strCategory
                     )
-                    .addToBackStack(null)
-                    .commit()
-            }
+
+                    searchFragment.arguments =
+                        bundle
+
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fragmentContainer,
+                            searchFragment
+                        )
+                        .addToBackStack(null)
+                        .commit()
+                }
+        }
+
+        // Recent Recipes
+
+        recentViewModel.recentMeals.observe(
+            viewLifecycleOwner
+        ) { recentMeals ->
+
+            recentRecycler.adapter =
+                RecentHomeAdapter(
+                    meals = recentMeals,
+                    favoriteViewModel = favoriteViewModel,
+                    favoriteIds = favoriteIds
+                ) { meal ->
+
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fragmentContainer,
+                            DetailsFragment.newInstance(
+                                meal.idMeal
+                            )
+                        )
+                        .addToBackStack(null)
+                        .commit()
+                }
         }
 
         viewModel.loadMeals()
