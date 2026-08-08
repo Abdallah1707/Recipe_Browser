@@ -14,17 +14,21 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.RecentRecipeAdapter
+import com.example.recipe_browser.viewmodel.FavoriteViewModel
 import com.example.recipe_browser.viewmodel.SearchViewModel
 import com.google.android.material.textfield.TextInputEditText
 
 class SearchFragment : Fragment() {
 
     private lateinit var viewModel: SearchViewModel
+    private lateinit var favoriteViewModel: FavoriteViewModel
 
     private lateinit var etSearch: TextInputEditText
     private lateinit var rvSearch: RecyclerView
     private lateinit var progressBar: ProgressBar
     private lateinit var tvNoResult: TextView
+
+    private val favoriteIds = mutableSetOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,7 +53,9 @@ class SearchFragment : Fragment() {
         viewModel =
             ViewModelProvider(this)[SearchViewModel::class.java]
 
-        // استقبال نتائج البحث
+        favoriteViewModel =
+            ViewModelProvider(this)[FavoriteViewModel::class.java]
+
         viewModel.meals.observe(viewLifecycleOwner) { meals ->
 
             progressBar.visibility = View.GONE
@@ -65,22 +71,43 @@ class SearchFragment : Fragment() {
                 rvSearch.visibility = View.VISIBLE
 
                 rvSearch.adapter =
-                    RecentRecipeAdapter(meals) { meal ->
+                    RecentRecipeAdapter(
+                        meals = meals,
+                        favoriteIds = favoriteIds,
 
-                        parentFragmentManager.beginTransaction()
-                            .replace(
-                                R.id.fragmentContainer,
-                                DetailsFragment.newInstance(
-                                    meal.idMeal
+                        onFavoriteClick = { favoriteMeal, add ->
+
+                            if (add) {
+
+                                favoriteViewModel.addFavorite(
+                                    favoriteMeal
                                 )
-                            )
-                            .addToBackStack(null)
-                            .commit()
-                    }
+
+                            } else {
+
+                                favoriteViewModel.removeFavoriteById(
+                                    favoriteMeal.idMeal
+                                )
+                            }
+                        },
+
+                        onClick = { meal ->
+
+                            parentFragmentManager
+                                .beginTransaction()
+                                .replace(
+                                    R.id.fragmentContainer,
+                                    DetailsFragment.newInstance(
+                                        meal.idMeal
+                                    )
+                                )
+                                .addToBackStack(null)
+                                .commit()
+                        }
+                    )
             }
         }
 
-        // لو جاي من Category
         val category =
             arguments?.getString("category")
 
@@ -94,7 +121,6 @@ class SearchFragment : Fragment() {
             viewModel.searchByCategory(category)
         }
 
-        // البحث العادي من Search Bar
         etSearch.setOnEditorActionListener { _, actionId, event ->
 
             if (

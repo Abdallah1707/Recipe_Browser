@@ -30,7 +30,7 @@
         android:layout_height="48dp"
         android:layout_margin="16dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/ic_favorite"
+        android:src="@drawable/ic_favorite_border"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
