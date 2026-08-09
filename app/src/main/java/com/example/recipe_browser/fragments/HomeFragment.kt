@@ -7,17 +7,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.CategoryAdapter
 import com.example.recipe_browser.adapter.MealAdapter
 import com.example.recipe_browser.adapter.RecentHomeAdapter
+import com.example.recipe_browser.room.MealDatabase
 import com.example.recipe_browser.viewmodel.FavoriteViewModel
 import com.example.recipe_browser.viewmodel.HomeViewModel
 import com.example.recipe_browser.viewmodel.RecentViewModel
+import kotlinx.coroutines.launch
 import java.io.File
 
 class HomeFragment : Fragment() {
@@ -29,7 +33,9 @@ class HomeFragment : Fragment() {
     private lateinit var popularRecycler: RecyclerView
     private lateinit var categoryRecycler: RecyclerView
     private lateinit var recentRecycler: RecyclerView
+
     private lateinit var imgProfile: ImageView
+    private lateinit var txtHello: TextView
 
     private val favoriteIds = mutableSetOf<String>()
 
@@ -45,28 +51,25 @@ class HomeFragment : Fragment() {
             false
         )
 
+        // Profile Image
         imgProfile =
-            view.findViewById(
-                R.id.imgProfileToolbar
-            )
+            view.findViewById(R.id.imgProfileToolbar)
 
+        // Hello Text
+        txtHello =
+            view.findViewById(R.id.txtHello)
+
+        // RecyclerViews
         popularRecycler =
-            view.findViewById(
-                R.id.rvPopular
-            )
+            view.findViewById(R.id.rvPopular)
 
         categoryRecycler =
-            view.findViewById(
-                R.id.rvCategories
-            )
+            view.findViewById(R.id.rvCategories)
 
         recentRecycler =
-            view.findViewById(
-                R.id.rvRecent
-            )
+            view.findViewById(R.id.rvRecent)
 
-        // Profile
-
+        // Profile Click
         imgProfile.setOnClickListener {
 
             parentFragmentManager
@@ -80,7 +83,6 @@ class HomeFragment : Fragment() {
         }
 
         // Popular Recycler
-
         popularRecycler.layoutManager =
             LinearLayoutManager(
                 requireContext(),
@@ -89,7 +91,6 @@ class HomeFragment : Fragment() {
             )
 
         // Categories Recycler
-
         categoryRecycler.layoutManager =
             LinearLayoutManager(
                 requireContext(),
@@ -98,7 +99,6 @@ class HomeFragment : Fragment() {
             )
 
         // Recent Recycler
-
         recentRecycler.layoutManager =
             LinearLayoutManager(
                 requireContext(),
@@ -107,7 +107,6 @@ class HomeFragment : Fragment() {
             )
 
         // ViewModels
-
         viewModel =
             ViewModelProvider(this)[
                 HomeViewModel::class.java
@@ -123,8 +122,10 @@ class HomeFragment : Fragment() {
                 FavoriteViewModel::class.java
             ]
 
-        // Favorites
+        // Load User Name
+        loadUserName()
 
+        // Favorites
         favoriteViewModel.favorites.observe(
             viewLifecycleOwner
         ) { favorites ->
@@ -137,8 +138,7 @@ class HomeFragment : Fragment() {
                 }
             )
 
-            recentViewModel.recentMeals.value?.let {
-                    recentMeals ->
+            recentViewModel.recentMeals.value?.let { recentMeals ->
 
                 setRecentAdapter(
                     recentMeals
@@ -147,7 +147,6 @@ class HomeFragment : Fragment() {
         }
 
         // Popular Recipes
-
         viewModel.meals.observe(
             viewLifecycleOwner
         ) { meals ->
@@ -155,14 +154,10 @@ class HomeFragment : Fragment() {
             popularRecycler.adapter =
                 MealAdapter(meals) { meal ->
 
-                    // Save to Recent
-
-                    recentViewModel.addRecent(
-                        meal
-                    )
+                    // Add to Recent
+                    recentViewModel.addRecent(meal)
 
                     // Open Details
-
                     openDetails(
                         meal.idMeal
                     )
@@ -170,7 +165,6 @@ class HomeFragment : Fragment() {
         }
 
         // Categories
-
         viewModel.categories.observe(
             viewLifecycleOwner
         ) { categories ->
@@ -206,7 +200,6 @@ class HomeFragment : Fragment() {
         }
 
         // Recent Recipes
-
         recentViewModel.recentMeals.observe(
             viewLifecycleOwner
         ) { recentMeals ->
@@ -216,17 +209,77 @@ class HomeFragment : Fragment() {
             )
         }
 
-        // Load data
-
+        // Load Data
         viewModel.loadMeals()
-
         viewModel.loadCategories()
 
         return view
     }
 
+    // Get first name from database
+    private fun loadUserName() {
+
+        val sharedPref =
+            requireActivity().getSharedPreferences(
+                "user_prefs",
+                Context.MODE_PRIVATE
+            )
+
+        val userEmail =
+            sharedPref.getString(
+                "userEmail",
+                null
+            )
+
+        if (userEmail.isNullOrEmpty()) {
+            txtHello.text = "Hi 👋"
+            return
+        }
+
+        val db =
+            MealDatabase.getDatabase(
+                requireContext()
+            )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            try {
+
+                val user =
+                    db.userDao()
+                        .getUserByEmail(userEmail)
+
+                if (user != null) {
+
+                    val name =
+                        user.name.trim()
+
+                    val firstName =
+                        name.split("\\s+".toRegex())
+                            .firstOrNull()
+                            ?: name
+
+                    txtHello.text =
+                        "Hi $firstName 👋"
+
+                } else {
+
+                    txtHello.text =
+                        "Hi 👋"
+                }
+
+            } catch (e: Exception) {
+
+                txtHello.text =
+                    "Hi 👋"
+            }
+        }
+    }
+
+    // Recent Adapter
     private fun setRecentAdapter(
-        recentMeals: List<com.example.recipe_browser.model.RecentMeal>
+        recentMeals:
+        List<com.example.recipe_browser.model.RecentMeal>
     ) {
 
         recentRecycler.adapter =
@@ -242,6 +295,7 @@ class HomeFragment : Fragment() {
             }
     }
 
+    // Open Details
     private fun openDetails(
         id: String
     ) {
@@ -250,23 +304,25 @@ class HomeFragment : Fragment() {
             .beginTransaction()
             .replace(
                 R.id.fragmentContainer,
-                DetailsFragment.newInstance(
-                    id
-                )
+                DetailsFragment.newInstance(id)
             )
             .addToBackStack(null)
             .commit()
     }
 
-    // Update profile image every time
-    // we return to Home
-
+    // Update profile image + username
+    // whenever we return to Home
     override fun onResume() {
 
         super.onResume()
 
         if (!::imgProfile.isInitialized) {
             return
+        }
+
+        // Update username
+        if (::txtHello.isInitialized) {
+            loadUserName()
         }
 
         val sharedPref =
