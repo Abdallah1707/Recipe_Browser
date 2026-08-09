@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.recipe_browser.RecipeRepository
 import com.example.recipe_browser.model.Category
 import com.example.recipe_browser.model.Meal
-import com.example.recipe_browser.model.mealApiServices
+import com.example.recipe_browser.network.mealApiServices
 
 import kotlinx.coroutines.launch
 

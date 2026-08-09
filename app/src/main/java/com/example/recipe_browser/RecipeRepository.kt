@@ -2,12 +2,8 @@ package com.example.recipe_browser
 
 import com.example.recipe_browser.model.Category
 import com.example.recipe_browser.model.Meal
-import com.example.recipe_browser.model.MealApiService
-import com.example.recipe_browser.model.local.daos.RecentRecipeDao
-import com.example.recipe_browser.model.local.daos.RecipeDao
-import com.example.recipe_browser.model.local.daos.SearchHistoryDao
-import com.example.recipe_browser.model.mealApiServices
-import com.example.recipe_browser.network.RetrofitClient
+import com.example.recipe_browser.network.MealApiService
+import com.example.recipe_browser.network.mealApiServices
 
 class RecipeRepository(
     private val apiService: MealApiService,
@@ -35,6 +31,12 @@ class RecipeRepository(
         return (1..count).mapNotNull {
             apiService.getRandomMeal().meals?.firstOrNull()
         }
+    }
+    suspend fun getMealsByCategory(category: String): List<Meal> {
+
+        return mealApiServices
+            .filterByCategory(category)
+            .meals ?: emptyList()
     }
 
 }

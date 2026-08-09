@@ -32,8 +32,10 @@ class HomeFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
 
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+
+        val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
 
         val etSearch = view.findViewById<TextInputEditText>(R.id.etSearch)
         etSearch.isFocusable = false
@@ -43,6 +45,30 @@ class HomeFragment : Fragment() {
         val txtBannerSubtitle = view.findViewById<TextView>(R.id.tv_BannerSubtitle)
         val bannerCard = view.findViewById<androidx.cardview.widget.CardView>(R.id.bannerCard)
 
+        popularRecycler = view.findViewById(R.id.rvPopular)
+        categoryRecycler = view.findViewById(R.id.rvCategories)
+
+        popularRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        categoryRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+
+            categoryRecycler.adapter = CategoryAdapter(categories) { category ->
+
+                val searchFragment = SearchFragment()
+                val bundle = Bundle()
+                bundle.putString("category", category.strCategory)
+                searchFragment.arguments = bundle
+
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, searchFragment)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
         etSearch.setOnClickListener {
             parentFragmentManager.beginTransaction()
@@ -50,16 +76,13 @@ class HomeFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-        imgProfile.setOnClickListener {
 
+        imgProfile.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentContainer, UserFragment())
                 .addToBackStack(null)
                 .commit()
-
         }
-
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         viewModel.randomMeal.observe(viewLifecycleOwner) { meal ->
             if (meal == null) return@observe
@@ -77,16 +100,6 @@ class HomeFragment : Fragment() {
                     .commit()
             }
         }
-        popularRecycler = view.findViewById(R.id.rvPopular)
-        categoryRecycler = view.findViewById(R.id.rvCategories)
-
-        popularRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-        categoryRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-
-
 
         viewModel.meals.observe(viewLifecycleOwner) { meals ->
 
@@ -101,12 +114,6 @@ class HomeFragment : Fragment() {
                     .commit()
 
             }
-
-        }
-
-        viewModel.categories.observe(viewLifecycleOwner) { categories ->
-
-            categoryRecycler.adapter = CategoryAdapter(categories)
 
         }
 

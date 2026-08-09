@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.model.MealAdapter
-import com.example.recipe_browser.model.mealApiServices
+import com.example.recipe_browser.network.mealApiServices
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.launch
 
