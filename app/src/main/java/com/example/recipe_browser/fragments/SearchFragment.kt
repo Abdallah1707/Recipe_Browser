@@ -59,7 +59,10 @@ class SearchFragment : Fragment() {
                 val sortedMeals = meals.sortedBy { it.strMeal }
 
                 recyclerView.adapter = MealAdapter(sortedMeals) { meal ->
-                    // opening recipe details
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, DetailsFragment.newInstance(meal.idMeal))
+                        .addToBackStack(null)
+                        .commit()
                 }
 
             } catch (e: Exception) {

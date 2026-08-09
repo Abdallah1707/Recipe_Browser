@@ -3,14 +3,16 @@ package com.example.recipe_browser.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.recipe_browser.RecipeRepository
 import com.example.recipe_browser.model.Category
 import com.example.recipe_browser.model.Meal
-import com.example.recipe_browser.repository.MealRepository
+import com.example.recipe_browser.model.mealApiServices
+
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
 
-    private val repository = MealRepository()
+    private val repository = RecipeRepository(mealApiServices)
 
     val meals = MutableLiveData<List<Meal>>()
     val categories = MutableLiveData<List<Category>>()
@@ -21,7 +23,7 @@ class HomeViewModel : ViewModel() {
 
             try {
 
-                meals.value = repository.getMeals()
+                meals.value = repository.getPopularRecipes()
 
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -45,5 +47,16 @@ class HomeViewModel : ViewModel() {
 
         }
 
+    }
+    val randomMeal = MutableLiveData<Meal>()
+
+    fun loadRandomMeal() {
+        viewModelScope.launch {
+            try {
+                randomMeal.value = repository.getRandomMeal()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }

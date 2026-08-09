@@ -137,12 +137,13 @@
                             android:textSize="28sp"/>
 
                         <TextView
+                            android:id="@+id/tv_BannerSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Healthy // Delicious Meals"
                             android:textColor="@android:color/white"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
 
                     </LinearLayout>
 

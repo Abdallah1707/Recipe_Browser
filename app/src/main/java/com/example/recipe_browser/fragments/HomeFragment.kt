@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import com.bumptech.glide.Glide
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,7 @@ import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.CategoryAdapter
 import com.example.recipe_browser.adapter.MealAdapter
 import com.example.recipe_browser.viewmodel.HomeViewModel
+import com.google.android.material.textfield.TextInputEditText
 
 class HomeFragment : Fragment() {
 
@@ -31,6 +34,22 @@ class HomeFragment : Fragment() {
 
         val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
 
+
+        val etSearch = view.findViewById<TextInputEditText>(R.id.etSearch)
+        etSearch.isFocusable = false
+        etSearch.isClickable = true
+
+        val imgBanner = view.findViewById<ImageView>(R.id.imgBanner)
+        val txtBannerSubtitle = view.findViewById<TextView>(R.id.tv_BannerSubtitle)
+        val bannerCard = view.findViewById<androidx.cardview.widget.CardView>(R.id.bannerCard)
+
+
+        etSearch.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, SearchFragment())
+                .addToBackStack(null)
+                .commit()
+        }
         imgProfile.setOnClickListener {
 
             parentFragmentManager.beginTransaction()
@@ -40,6 +59,24 @@ class HomeFragment : Fragment() {
 
         }
 
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+
+        viewModel.randomMeal.observe(viewLifecycleOwner) { meal ->
+            if (meal == null) return@observe
+
+            txtBannerSubtitle.text = meal.strMeal
+
+            Glide.with(this)
+                .load(meal.strMealThumb)
+                .into(imgBanner)
+
+            bannerCard.setOnClickListener {
+                parentFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainer, DetailsFragment.newInstance(meal.idMeal))
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
         popularRecycler = view.findViewById(R.id.rvPopular)
         categoryRecycler = view.findViewById(R.id.rvCategories)
 
@@ -49,7 +86,7 @@ class HomeFragment : Fragment() {
         categoryRecycler.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+
 
         viewModel.meals.observe(viewLifecycleOwner) { meals ->
 
@@ -75,6 +112,7 @@ class HomeFragment : Fragment() {
 
         viewModel.loadMeals()
         viewModel.loadCategories()
+        viewModel.loadRandomMeal()
 
         return view
     }
