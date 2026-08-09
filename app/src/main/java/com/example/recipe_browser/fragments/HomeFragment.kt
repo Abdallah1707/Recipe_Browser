@@ -5,110 +5,77 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
-import com.example.recipe_browser.RecipeRepository
-import com.example.recipe_browser.model.MealApiService
-import com.example.recipe_browser.model.PopularRecipeAdapter
-import com.example.recipe_browser.model.local.database.RecipeDatabase
-import com.example.recipe_browser.room.MealDatabase
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.textfield.TextInputEditText
-import kotlinx.coroutines.launch
-import com.example.recipe_browser.model.mealApiServices
+import com.example.recipe_browser.adapter.CategoryAdapter
+import com.example.recipe_browser.adapter.MealAdapter
+import com.example.recipe_browser.viewmodel.HomeViewModel
 
 class HomeFragment : Fragment() {
 
+    private lateinit var viewModel: HomeViewModel
+
+    private lateinit var popularRecycler: RecyclerView
+    private lateinit var categoryRecycler: RecyclerView
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
+
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        val imgProfileToolbar = view.findViewById<ImageView>(R.id.imgProfileToolbar)
-        imgProfileToolbar.setOnClickListener {
+        val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
+
+        imgProfile.setOnClickListener {
+
             parentFragmentManager.beginTransaction()
-                .replace(android.R.id.content, UserFragment())
+                .replace(R.id.fragmentContainer, UserFragment())
                 .addToBackStack(null)
                 .commit()
+
         }
 
-        val etSearch = view.findViewById<TextInputEditText>(R.id.etSearch)
-        etSearch.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(android.R.id.content, SearchFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-        etSearch.isFocusable = false
+        popularRecycler = view.findViewById(R.id.rvPopular)
+        categoryRecycler = view.findViewById(R.id.rvCategories)
 
-        val bottomNav = view.findViewById<BottomNavigationView>(R.id.bottomNavigation)
-        bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.homeFragment -> true
-                R.id.searchFragment -> {
-                    parentFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, SearchFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    true
-                }
-                R.id.favoriteFragment -> {
-                    parentFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, FavoriteFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    true
-                }
-                R.id.aboutFragment -> {
-                    parentFragmentManager.beginTransaction()
-                        .replace(android.R.id.content, AboutFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    true
-                }
-                else -> false
+        popularRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        categoryRecycler.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+
+        viewModel.meals.observe(viewLifecycleOwner) { meals ->
+
+            popularRecycler.adapter = MealAdapter(meals) { meal ->
+
+                parentFragmentManager.beginTransaction()
+                    .replace(
+                        R.id.fragmentContainer,
+                        DetailsFragment.newInstance(meal.idMeal)
+                    )
+                    .addToBackStack(null)
+                    .commit()
+
             }
+
         }
+
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
+
+            categoryRecycler.adapter = CategoryAdapter(categories)
+
+        }
+
+        viewModel.loadMeals()
+        viewModel.loadCategories()
 
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val txtHello = view.findViewById<TextView>(R.id.txtHello)
-        val sharedPref = requireActivity().getSharedPreferences("user_prefs", android.content.Context.MODE_PRIVATE)
-        val userEmail = sharedPref.getString("userEmail", null)
-        val rvPopular = view.findViewById<RecyclerView>(R.id.rvPopular)
-        rvPopular.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-        if (userEmail != null) {
-            val db = MealDatabase.getDatabase(requireContext())
-            lifecycleScope.launch {
-                try {
-                    val user = db.userDao().getUserByEmail(userEmail)
-                    if (user != null) {
-                        txtHello.text = "Hello, ${user.name} 👋"
-                    }
-                    val repository = RecipeRepository(
-                        mealApiServices,
-                        RecipeDatabase.getInstance(requireContext()).recentRecipeDao(),
-                        RecipeDatabase.getInstance(requireContext()).recipeDao(),
-                        RecipeDatabase.getInstance(requireContext()).searchHistoryDao()
-                    )
-
-                    val meals = repository.getPopularRecipes()
-
-                    rvPopular.adapter = PopularRecipeAdapter(meals)
-                } catch (e: Exception) {
-
-                }
-            }
-        }
     }
 }

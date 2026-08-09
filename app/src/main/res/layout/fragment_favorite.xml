@@ -5,25 +5,45 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_home">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_home"
+        android:alpha="0.18"
         android:scaleType="centerCrop"
-        android:alpha="0.15"/>
+        android:src="@drawable/banner_food"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#F8FFFFFF"/>
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:color/transparent"
+        android:paddingEnd="20dp"
+        app:title="Favorite Recipes ❤️"
+        app:titleTextColor="#222222"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:id="@+id/contentLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -38,25 +58,30 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Favorite Recipes ❤️"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            android:textColor="#222222"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:text="Your saved recipes"
             android:textColor="#777777"
-            android:textSize="15sp"/>
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvEmptyFavorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="No favorite recipes yet ❤️"
+            android:textColor="#777777"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvFavorite"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="20dp"
             android:layout_weight="1"
+            android:layout_marginTop="20dp"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp"
             tools:listitem="@layout/item_recent_recipe"/>
 
     </LinearLayout>

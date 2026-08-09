@@ -32,17 +32,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imgProfileToolbar"
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_gravity="end|center_vertical"
             android:layout_marginEnd="16dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/circle_background"
-            android:padding="2dp"
+            android:layout_marginTop="6dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/profile"/>
+            android:src="@drawable/profile"
+            app:shapeAppearanceOverlay="@style/CircleImage"
+            app:strokeColor="@android:color/white"
+            app:strokeWidth="2dp"/>
 
     </com.google.android.material.appbar.MaterialToolbar>
 
@@ -260,19 +261,5 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="80dp"
-        android:background="@android:color/white"
-        android:elevation="10dp"
-        app:itemIconTint="@color/bottom_nav_selector"
-        app:itemTextColor="@color/bottom_nav_selector"
-        app:labelVisibilityMode="labeled"
-        app:menu="@menu/bottom_nav_menu"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
