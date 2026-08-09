@@ -20,17 +20,24 @@ class SearchViewModel : ViewModel() {
         viewModelScope.launch {
 
             try {
-
                 meals.value = repository.searchMeals(name)
-
             } catch (e: Exception) {
-
+                e.printStackTrace()
                 meals.value = emptyList()
-
             }
-
         }
-
     }
 
+    fun searchByCategory(category: String) {
+
+        viewModelScope.launch {
+
+            try {
+                meals.value = repository.getMealsByCategory(category)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                meals.value = emptyList()
+            }
+        }
+    }
 }
