@@ -1,5 +1,7 @@
 package com.example.recipe_browser.fragments
 
+import android.content.Context
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,6 +18,7 @@ import com.example.recipe_browser.adapter.RecentHomeAdapter
 import com.example.recipe_browser.viewmodel.FavoriteViewModel
 import com.example.recipe_browser.viewmodel.HomeViewModel
 import com.example.recipe_browser.viewmodel.RecentViewModel
+import java.io.File
 
 class HomeFragment : Fragment() {
 
@@ -26,6 +29,7 @@ class HomeFragment : Fragment() {
     private lateinit var popularRecycler: RecyclerView
     private lateinit var categoryRecycler: RecyclerView
     private lateinit var recentRecycler: RecyclerView
+    private lateinit var imgProfile: ImageView
 
     private val favoriteIds = mutableSetOf<String>()
 
@@ -41,10 +45,27 @@ class HomeFragment : Fragment() {
             false
         )
 
-        val imgProfile =
-            view.findViewById<ImageView>(
+        imgProfile =
+            view.findViewById(
                 R.id.imgProfileToolbar
             )
+
+        popularRecycler =
+            view.findViewById(
+                R.id.rvPopular
+            )
+
+        categoryRecycler =
+            view.findViewById(
+                R.id.rvCategories
+            )
+
+        recentRecycler =
+            view.findViewById(
+                R.id.rvRecent
+            )
+
+        // Profile
 
         imgProfile.setOnClickListener {
 
@@ -58,14 +79,7 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        popularRecycler =
-            view.findViewById(R.id.rvPopular)
-
-        categoryRecycler =
-            view.findViewById(R.id.rvCategories)
-
-        recentRecycler =
-            view.findViewById(R.id.rvRecent)
+        // Popular Recycler
 
         popularRecycler.layoutManager =
             LinearLayoutManager(
@@ -74,12 +88,16 @@ class HomeFragment : Fragment() {
                 false
             )
 
+        // Categories Recycler
+
         categoryRecycler.layoutManager =
             LinearLayoutManager(
                 requireContext(),
                 LinearLayoutManager.HORIZONTAL,
                 false
             )
+
+        // Recent Recycler
 
         recentRecycler.layoutManager =
             LinearLayoutManager(
@@ -88,16 +106,24 @@ class HomeFragment : Fragment() {
                 false
             )
 
+        // ViewModels
+
         viewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
+            ViewModelProvider(this)[
+                HomeViewModel::class.java
+            ]
 
         recentViewModel =
-            ViewModelProvider(this)[RecentViewModel::class.java]
+            ViewModelProvider(this)[
+                RecentViewModel::class.java
+            ]
 
         favoriteViewModel =
-            ViewModelProvider(this)[FavoriteViewModel::class.java]
+            ViewModelProvider(this)[
+                FavoriteViewModel::class.java
+            ]
 
-        // Favorites from Room
+        // Favorites
 
         favoriteViewModel.favorites.observe(
             viewLifecycleOwner
@@ -111,26 +137,12 @@ class HomeFragment : Fragment() {
                 }
             )
 
-            recentViewModel.recentMeals.value?.let { recentMeals ->
+            recentViewModel.recentMeals.value?.let {
+                    recentMeals ->
 
-                recentRecycler.adapter =
-                    RecentHomeAdapter(
-                        meals = recentMeals,
-                        favoriteViewModel = favoriteViewModel,
-                        favoriteIds = favoriteIds
-                    ) { meal ->
-
-                        parentFragmentManager
-                            .beginTransaction()
-                            .replace(
-                                R.id.fragmentContainer,
-                                DetailsFragment.newInstance(
-                                    meal.idMeal
-                                )
-                            )
-                            .addToBackStack(null)
-                            .commit()
-                    }
+                setRecentAdapter(
+                    recentMeals
+                )
             }
         }
 
@@ -143,18 +155,17 @@ class HomeFragment : Fragment() {
             popularRecycler.adapter =
                 MealAdapter(meals) { meal ->
 
-                    recentViewModel.addRecent(meal)
+                    // Save to Recent
 
-                    parentFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragmentContainer,
-                            DetailsFragment.newInstance(
-                                meal.idMeal
-                            )
-                        )
-                        .addToBackStack(null)
-                        .commit()
+                    recentViewModel.addRecent(
+                        meal
+                    )
+
+                    // Open Details
+
+                    openDetails(
+                        meal.idMeal
+                    )
                 }
         }
 
@@ -165,7 +176,9 @@ class HomeFragment : Fragment() {
         ) { categories ->
 
             categoryRecycler.adapter =
-                CategoryAdapter(categories) { category ->
+                CategoryAdapter(
+                    categories
+                ) { category ->
 
                     val searchFragment =
                         SearchFragment()
@@ -198,29 +211,100 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner
         ) { recentMeals ->
 
-            recentRecycler.adapter =
-                RecentHomeAdapter(
-                    meals = recentMeals,
-                    favoriteViewModel = favoriteViewModel,
-                    favoriteIds = favoriteIds
-                ) { meal ->
-
-                    parentFragmentManager
-                        .beginTransaction()
-                        .replace(
-                            R.id.fragmentContainer,
-                            DetailsFragment.newInstance(
-                                meal.idMeal
-                            )
-                        )
-                        .addToBackStack(null)
-                        .commit()
-                }
+            setRecentAdapter(
+                recentMeals
+            )
         }
 
+        // Load data
+
         viewModel.loadMeals()
+
         viewModel.loadCategories()
 
         return view
+    }
+
+    private fun setRecentAdapter(
+        recentMeals: List<com.example.recipe_browser.model.RecentMeal>
+    ) {
+
+        recentRecycler.adapter =
+            RecentHomeAdapter(
+                meals = recentMeals,
+                favoriteViewModel = favoriteViewModel,
+                favoriteIds = favoriteIds
+            ) { meal ->
+
+                openDetails(
+                    meal.idMeal
+                )
+            }
+    }
+
+    private fun openDetails(
+        id: String
+    ) {
+
+        parentFragmentManager
+            .beginTransaction()
+            .replace(
+                R.id.fragmentContainer,
+                DetailsFragment.newInstance(
+                    id
+                )
+            )
+            .addToBackStack(null)
+            .commit()
+    }
+
+    // Update profile image every time
+    // we return to Home
+
+    override fun onResume() {
+
+        super.onResume()
+
+        if (!::imgProfile.isInitialized) {
+            return
+        }
+
+        val sharedPref =
+            requireActivity()
+                .getSharedPreferences(
+                    "user_prefs",
+                    Context.MODE_PRIVATE
+                )
+
+        val savedImage =
+            sharedPref.getString(
+                "profile_image",
+                null
+            )
+
+        if (!savedImage.isNullOrEmpty()) {
+
+            val file =
+                File(savedImage)
+
+            if (file.exists()) {
+
+                imgProfile.setImageURI(
+                    Uri.fromFile(file)
+                )
+
+            } else {
+
+                imgProfile.setImageResource(
+                    R.drawable.profile
+                )
+            }
+
+        } else {
+
+            imgProfile.setImageResource(
+                R.drawable.profile
+            )
+        }
     }
 }
