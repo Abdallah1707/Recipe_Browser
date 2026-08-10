@@ -1,44 +1,44 @@
 package com.example.recipe_browser.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipe_browser.database.AppDatabase
-import com.example.recipe_browser.model.FavoriteMeal
-import com.example.recipe_browser.repository.FavoriteRepository
+import com.example.recipe_browser.model.local.entities.RecipeEntity
+import com.example.recipe_browser.model.repository.RecipeRepository
 import kotlinx.coroutines.launch
 
 class FavoriteViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+    private val repository: RecipeRepository
+) : ViewModel() {
 
-    private val dao =
-        AppDatabase.getDatabase(application).favoriteDao()
+    private val _favorites =
+        MutableLiveData<List<RecipeEntity>>()
 
-    private val repository =
-        FavoriteRepository(dao)
+    val favorites: LiveData<List<RecipeEntity>> =
+        _favorites
 
-    val favorites =
-        repository.getAllFavorites()
 
-    fun isFavorite(id: String) =
-        repository.isFavorite(id)
-
-    fun addFavorite(meal: FavoriteMeal) {
+    fun loadFavorites() {
         viewModelScope.launch {
-            repository.addFavorite(meal)
+            try {
+                _favorites.value =
+                    repository.getFavoriteRecipes()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
-    fun removeFavorite(meal: FavoriteMeal) {
+    fun toggleFavorite(recipe: RecipeEntity) {
         viewModelScope.launch {
-            repository.removeFavorite(meal)
-        }
-    }
-
-    fun removeFavoriteById(id: String) {
-        viewModelScope.launch {
-            repository.removeFavoriteById(id)
+            val updatedRecipe =
+                recipe.copy(
+                    isFavorite = !recipe.isFavorite
+                )
+            repository.updateRecipe(updatedRecipe)
+            loadFavorites()
         }
     }
 }

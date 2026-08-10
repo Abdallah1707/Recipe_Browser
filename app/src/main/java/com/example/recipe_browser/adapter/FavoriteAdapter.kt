@@ -9,11 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.recipe_browser.R
-import com.example.recipe_browser.model.FavoriteMeal
+import com.example.recipe_browser.model.local.entities.RecipeEntity
 
 class FavoriteAdapter(
-    private val meals: List<FavoriteMeal>,
-    private val onClick: (FavoriteMeal) -> Unit
+    private val meals: List<RecipeEntity>,
+    private val onClick: (RecipeEntity) -> Unit
 ) : RecyclerView.Adapter<FavoriteAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) :
@@ -58,7 +58,7 @@ class FavoriteAdapter(
             meal.strMeal
 
         holder.txtRecentTime.text =
-            meal.strCategory ?: "Recipe"
+            meal.strCategory
 
         Glide.with(holder.itemView.context)
             .load(meal.strMealThumb)
@@ -68,10 +68,6 @@ class FavoriteAdapter(
         holder.btnFavorite.setImageResource(
             R.drawable.ic_favorite
         )
-
-        holder.btnFavorite.setOnClickListener {
-            // هنربطه بالحذف من Room بعد كده
-        }
 
         holder.itemView.setOnClickListener {
             onClick(meal)

@@ -14,13 +14,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.CategoryAdapter
 import com.example.recipe_browser.adapter.MealAdapter
+import com.example.recipe_browser.adapter.RecentHomeAdapter
+import com.example.recipe_browser.model.RepositoryProvider
 import com.example.recipe_browser.viewmodel.HomeViewModel
+import com.example.recipe_browser.viewmodel.RecentViewModel
+import com.example.recipe_browser.viewmodel.ViewModelFactory
 import com.google.android.material.textfield.TextInputEditText
 
 class HomeFragment : Fragment() {
 
     private lateinit var viewModel: HomeViewModel
-
+    private lateinit var recentViewModel: RecentViewModel
+    private lateinit var recentRecycler: RecyclerView
     private lateinit var popularRecycler: RecyclerView
     private lateinit var categoryRecycler: RecyclerView
 
@@ -31,9 +36,23 @@ class HomeFragment : Fragment() {
     ): View {
 
         val view = inflater.inflate(R.layout.fragment_home, container, false)
+        val repository =
+            RepositoryProvider.provideRepository(requireContext())
 
+        val factory =
+            ViewModelFactory(repository)
 
-        viewModel = ViewModelProvider(this)[HomeViewModel::class.java]
+        viewModel =
+            ViewModelProvider(
+                this,
+                factory
+            )[HomeViewModel::class.java]
+
+        recentViewModel =
+            ViewModelProvider(
+                this,
+                factory
+            )[RecentViewModel::class.java]
 
         val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
 
@@ -47,6 +66,14 @@ class HomeFragment : Fragment() {
 
         popularRecycler = view.findViewById(R.id.rvPopular)
         categoryRecycler = view.findViewById(R.id.rvCategories)
+        recentRecycler = view.findViewById(R.id.rvRecent)
+
+        recentRecycler.layoutManager =
+            LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
 
         popularRecycler.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
@@ -116,11 +143,29 @@ class HomeFragment : Fragment() {
             }
 
         }
+        recentViewModel.recentRecipes.observe(
+            viewLifecycleOwner
+        ) { recipes ->
 
+            recentRecycler.adapter =
+                RecentHomeAdapter(recipes) { recipe ->
+
+                    parentFragmentManager
+                        .beginTransaction()
+                        .replace(
+                            R.id.fragmentContainer,
+                            DetailsFragment.newInstance(
+                                recipe.idMeal
+                            )
+                        )
+                        .addToBackStack(null)
+                        .commit()
+                }
+        }
         viewModel.loadMeals()
         viewModel.loadCategories()
         viewModel.loadRandomMeal()
-
+        recentViewModel.loadRecentRecipes()
         return view
     }
 }

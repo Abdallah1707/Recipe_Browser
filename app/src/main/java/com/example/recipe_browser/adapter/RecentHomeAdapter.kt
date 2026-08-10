@@ -9,15 +9,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.recipe_browser.R
-import com.example.recipe_browser.model.FavoriteMeal
-import com.example.recipe_browser.model.RecentMeal
+import com.example.recipe_browser.model.local.entities.RecipeEntity
 import com.example.recipe_browser.viewmodel.FavoriteViewModel
 
 class RecentHomeAdapter(
-    private val meals: List<RecentMeal>,
-    private val favoriteViewModel: FavoriteViewModel,
-    private val favoriteIds: MutableSet<String>,
-    private val onClick: (RecentMeal) -> Unit
+    private val recipes: List<RecipeEntity>,
+    private val onClick: (RecipeEntity) -> Unit
 ) : RecyclerView.Adapter<RecentHomeAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) :
@@ -56,78 +53,30 @@ class RecentHomeAdapter(
         position: Int
     ) {
 
-        val meal = meals[position]
+        val recipe = recipes[position]
 
-        holder.name.text = meal.strMeal
+        holder.name.text = recipe.strMeal
+
         holder.category.text =
-            meal.strCategory ?: "Recipe"
+            recipe.strCategory
 
         Glide.with(holder.itemView.context)
-            .load(meal.strMealThumb)
+            .load(recipe.strMealThumb)
             .placeholder(R.drawable.banner_food)
             .into(holder.image)
 
-        updateFavoriteIcon(holder, meal.idMeal)
-
-        holder.favorite.setOnClickListener {
-
-            val favoriteMeal = FavoriteMeal(
-                idMeal = meal.idMeal,
-                strMeal = meal.strMeal,
-                strCategory = meal.strCategory,
-                strArea = null,
-                strInstructions = null,
-                strMealThumb = meal.strMealThumb,
-                strYoutube = null
-            )
-
-            if (favoriteIds.contains(meal.idMeal)) {
-
-                favoriteViewModel.removeFavoriteById(
-                    meal.idMeal
-                )
-
-                favoriteIds.remove(meal.idMeal)
-
-            } else {
-
-                favoriteViewModel.addFavorite(
-                    favoriteMeal
-                )
-
-                favoriteIds.add(meal.idMeal)
-            }
-
-            updateFavoriteIcon(
-                holder,
-                meal.idMeal
-            )
-        }
+        holder.favorite.setImageResource(
+            if (recipe.isFavorite)
+                R.drawable.ic_favorite
+            else
+                R.drawable.ic_favorite_border
+        )
 
         holder.itemView.setOnClickListener {
-            onClick(meal)
-        }
-    }
-
-    private fun updateFavoriteIcon(
-        holder: ViewHolder,
-        id: String
-    ) {
-
-        if (favoriteIds.contains(id)) {
-
-            holder.favorite.setImageResource(
-                R.drawable.ic_favorite
-            )
-
-        } else {
-
-            holder.favorite.setImageResource(
-                R.drawable.ic_favorite_border
-            )
+            onClick(recipe)
         }
     }
 
     override fun getItemCount(): Int =
-        meals.size
+        recipes.size
 }

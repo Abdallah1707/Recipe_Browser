@@ -1,37 +1,34 @@
 package com.example.recipe_browser.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipe_browser.database.AppDatabase
-import com.example.recipe_browser.model.Meal
-import com.example.recipe_browser.model.RecentMeal
+import com.example.recipe_browser.model.local.entities.RecipeEntity
+import com.example.recipe_browser.model.repository.RecipeRepository
 import kotlinx.coroutines.launch
 
-class RecentViewModel(application: Application) :
-    AndroidViewModel(application) {
+class RecentViewModel(
+    private val repository: RecipeRepository
+) : ViewModel() {
 
-    private val dao =
-        AppDatabase
-            .getDatabase(application)
-            .recentMealDao()
+    private val _recentRecipes =
+        MutableLiveData<List<RecipeEntity>>()
 
-    val recentMeals: LiveData<List<RecentMeal>> =
-        dao.getRecentMeals()
+    val recentRecipes: LiveData<List<RecipeEntity>> =
+        _recentRecipes
 
-    fun addRecent(meal: Meal) {
+    fun loadRecentRecipes() {
 
         viewModelScope.launch {
 
-            dao.insertRecent(
-                RecentMeal(
-                    idMeal = meal.idMeal,
-                    strMeal = meal.strMeal,
-                    strCategory = meal.strCategory,
-                    strMealThumb = meal.strMealThumb
-                )
-            )
+            try {
+                _recentRecipes.value =
+                    repository.getRecentRecipes()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

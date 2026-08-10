@@ -1,42 +1,93 @@
 package com.example.recipe_browser.viewmodel
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.recipe_browser.RecipeRepository
 import com.example.recipe_browser.model.Meal
-import com.example.recipe_browser.network.mealApiServices
-
+import com.example.recipe_browser.model.local.entities.SearchHistoryEntity
+import com.example.recipe_browser.model.repository.RecipeRepository
 import kotlinx.coroutines.launch
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(
+    private val repository: RecipeRepository
+) : ViewModel() {
 
-    private val repository = RecipeRepository(mealApiServices)
+    private val _searchResults =
+        MutableLiveData<List<Meal>>()
 
-    val meals = MutableLiveData<List<Meal>>()
+    val searchResults: LiveData<List<Meal>> =
+        _searchResults
 
-    fun search(name: String) {
+    private val _searchHistory =
+        MutableLiveData<List<SearchHistoryEntity>>()
 
+    val searchHistory: LiveData<List<SearchHistoryEntity>> =
+        _searchHistory
+
+    fun searchMeal(query: String) {
+
+        android.util.Log.d(
+            "SEARCH_DEBUG",
+            "searchMeal CALLED -> $query"
+        )
         viewModelScope.launch {
 
             try {
-                meals.value = repository.searchMeals(name)
+
+                val cleanQuery = query.trim()
+
+                if (cleanQuery.isEmpty()) return@launch
+
+                val meals = repository.searchMeal(cleanQuery)
+
+                _searchResults.value =
+                    meals.sortedBy { it.strMeal }
+
+                val history =
+                    repository.getSearchHistory()
+
+                val alreadyExists =
+                    history.any {
+                        it.keyword.equals(
+                            cleanQuery,
+                            ignoreCase = true
+                        )
+                    }
+
+                if (!alreadyExists) {
+
+                    repository.insertSearch(
+                        SearchHistoryEntity(
+                            keyword = cleanQuery,
+                            time = System.currentTimeMillis()
+                        )
+                    )
+                }
+
+                loadSearchHistory()
+
             } catch (e: Exception) {
+
                 e.printStackTrace()
-                meals.value = emptyList()
             }
         }
     }
 
-    fun searchByCategory(category: String) {
+    fun loadSearchHistory() {
 
         viewModelScope.launch {
 
             try {
-                meals.value = repository.getMealsByCategory(category)
+
+                val history =
+                    repository.getSearchHistory()
+
+                _searchHistory.postValue(history)
+
             } catch (e: Exception) {
+
                 e.printStackTrace()
-                meals.value = emptyList()
             }
         }
     }

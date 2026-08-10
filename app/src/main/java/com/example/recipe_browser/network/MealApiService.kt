@@ -22,6 +22,7 @@ interface MealApiService {
     @GET("filter.php")
     suspend fun filterByCategory(@Query("c") category: String): MealResponse
 
+
 }
 
 val retrofit: Retrofit = Retrofit.Builder()

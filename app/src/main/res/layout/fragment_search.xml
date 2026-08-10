@@ -45,6 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Search Box -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,10 +64,34 @@
                 android:layout_height="wrap_content"
                 android:hint="Search recipes..."
                 android:imeOptions="actionSearch"
-                android:inputType="text"/>
+                android:inputType="text" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
+
+        <!-- Recent Searches Title -->
+        <TextView
+            android:id="@+id/tvRecentSearches"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Recent Searches"
+            android:textColor="#222222"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+
+        <!-- Recent Searches -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSearchHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:clipToPadding="false"
+            android:paddingBottom="10dp" />
+
+
+        <!-- Loading -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="40dp"
@@ -75,18 +100,22 @@
             android:layout_marginTop="24dp"
             android:visibility="gone" />
 
+
+        <!-- No Results -->
         <TextView
             android:id="@+id/tvNoResult"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="24dp"
-            android:text="No recipes found 😔"
+            android:text="No recipes found "
             android:textColor="#777777"
             android:textSize="18sp"
             android:textStyle="bold"
             android:visibility="gone" />
 
+
+        <!-- Search Results -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvSearch"
             android:layout_width="match_parent"
@@ -95,8 +124,9 @@
             android:layout_weight="1"
             android:clipToPadding="false"
             android:paddingBottom="16dp"
-            tools:listitem="@layout/item_recent_recipe"/>
+            tools:listitem="@layout/item_recent_recipe" />
 
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+<!--fragment_search-->

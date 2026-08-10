@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.recipe_browser.R
-import com.example.recipe_browser.model.FavoriteMeal
-import com.example.recipe_browser.model.Meal
+import com.example.recipe_browser.model.local.entities.RecipeEntity
 
 class RecentRecipeAdapter(
-    private val meals: List<Meal>,
+    private val recipes: List<RecipeEntity>,
     private val favoriteIds: MutableSet<String>,
-    private val onFavoriteClick: (FavoriteMeal, Boolean) -> Unit,
-    private val onClick: (Meal) -> Unit
+    private val onFavoriteClick: (RecipeEntity) -> Unit,
+    private val onClick: (RecipeEntity) -> Unit
+
 ) : RecyclerView.Adapter<RecentRecipeAdapter.RecipeViewHolder>() {
 
     class RecipeViewHolder(itemView: View) :
@@ -55,61 +55,41 @@ class RecentRecipeAdapter(
         position: Int
     ) {
 
-        val meal = meals[position]
+        val recipe = recipes[position]
 
-        holder.txtRecentName.text =
-            meal.strMeal
+        holder.txtRecentName.text = recipe.strMeal
 
         holder.txtRecentTime.text =
-            meal.strCategory ?: "Recipe"
+            recipe.strCategory.ifEmpty { "Recipe" }
 
         Glide.with(holder.itemView.context)
-            .load(meal.strMealThumb)
+            .load(recipe.strMealThumb)
             .placeholder(R.drawable.banner_food)
             .into(holder.imgRecent)
 
         updateFavoriteIcon(
             holder.btnFavorite,
-            meal.idMeal
+            recipe.idMeal
         )
 
         holder.btnFavorite.setOnClickListener {
 
-            val isFavorite =
-                favoriteIds.contains(meal.idMeal)
+            onFavoriteClick(recipe)
 
-            val favoriteMeal = FavoriteMeal(
-                idMeal = meal.idMeal,
-                strMeal = meal.strMeal,
-                strCategory = meal.strCategory,
-                strArea = meal.strArea,
-                strInstructions = meal.strInstructions,
-                strMealThumb = meal.strMealThumb,
-                strYoutube = meal.strYoutube
-            )
-
-            if (isFavorite) {
-
-                favoriteIds.remove(meal.idMeal)
-
+            if (favoriteIds.contains(recipe.idMeal)) {
+                favoriteIds.remove(recipe.idMeal)
             } else {
-
-                favoriteIds.add(meal.idMeal)
+                favoriteIds.add(recipe.idMeal)
             }
 
             updateFavoriteIcon(
                 holder.btnFavorite,
-                meal.idMeal
-            )
-
-            onFavoriteClick(
-                favoriteMeal,
-                !isFavorite
+                recipe.idMeal
             )
         }
 
         holder.itemView.setOnClickListener {
-            onClick(meal)
+            onClick(recipe)
         }
     }
 
@@ -133,5 +113,5 @@ class RecentRecipeAdapter(
     }
 
     override fun getItemCount(): Int =
-        meals.size
+        recipes.size
 }

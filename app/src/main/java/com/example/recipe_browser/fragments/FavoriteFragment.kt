@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.FavoriteAdapter
+import com.example.recipe_browser.model.RepositoryProvider
 import com.example.recipe_browser.viewmodel.FavoriteViewModel
+import com.example.recipe_browser.viewmodel.ViewModelFactory
 
 class FavoriteFragment : Fragment() {
 
@@ -32,14 +34,40 @@ class FavoriteFragment : Fragment() {
             false
         )
 
-        rvFavorite = view.findViewById(R.id.rvFavorite)
-        tvEmptyFavorite = view.findViewById(R.id.tvEmptyFavorite)
+        rvFavorite =
+            view.findViewById(R.id.rvFavorite)
+
+        tvEmptyFavorite =
+            view.findViewById(R.id.tvEmptyFavorite)
 
         rvFavorite.layoutManager =
             LinearLayoutManager(requireContext())
 
+        val repository =
+            RepositoryProvider.provideRepository(
+                requireContext()
+            )
+
+        val factory =
+            ViewModelFactory(repository)
+
         favoriteViewModel =
-            ViewModelProvider(this)[FavoriteViewModel::class.java]
+            ViewModelProvider(
+                this,
+                factory
+            )[FavoriteViewModel::class.java]
+
+        return view
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         favoriteViewModel.favorites.observe(
             viewLifecycleOwner
@@ -47,23 +75,28 @@ class FavoriteFragment : Fragment() {
 
             if (favorites.isEmpty()) {
 
-                tvEmptyFavorite.visibility = View.VISIBLE
-                rvFavorite.visibility = View.GONE
+                tvEmptyFavorite.visibility =
+                    View.VISIBLE
+
+                rvFavorite.visibility =
+                    View.GONE
 
             } else {
 
-                tvEmptyFavorite.visibility = View.GONE
-                rvFavorite.visibility = View.VISIBLE
+                tvEmptyFavorite.visibility =
+                    View.GONE
+
+                rvFavorite.visibility =
+                    View.VISIBLE
 
                 rvFavorite.adapter =
-                    FavoriteAdapter(favorites) { meal ->
-
-                        parentFragmentManager
+                    FavoriteAdapter(favorites) {
+                        recipe -> parentFragmentManager
                             .beginTransaction()
                             .replace(
                                 R.id.fragmentContainer,
                                 DetailsFragment.newInstance(
-                                    meal.idMeal
+                                    recipe.idMeal
                                 )
                             )
                             .addToBackStack(null)
@@ -72,6 +105,6 @@ class FavoriteFragment : Fragment() {
             }
         }
 
-        return view
+        favoriteViewModel.loadFavorites()
     }
 }

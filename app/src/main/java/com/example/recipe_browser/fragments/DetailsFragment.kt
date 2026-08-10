@@ -11,9 +11,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.recipe_browser.R
-import com.example.recipe_browser.model.FavoriteMeal
+import com.example.recipe_browser.model.RepositoryProvider
 import com.example.recipe_browser.viewmodel.DetailsViewModel
-import com.example.recipe_browser.viewmodel.FavoriteViewModel
+import com.example.recipe_browser.viewmodel.ViewModelFactory
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
@@ -21,7 +21,6 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 class DetailsFragment : Fragment() {
 
     private lateinit var viewModel: DetailsViewModel
-    private lateinit var favoriteViewModel: FavoriteViewModel
 
     private lateinit var imgMeal: ImageView
     private lateinit var txtName: TextView
@@ -30,8 +29,6 @@ class DetailsFragment : Fragment() {
 
     private lateinit var btnFavorite: ImageButton
     private lateinit var btnBack: ImageButton
-
-    private var isFavorite = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,9 +42,14 @@ class DetailsFragment : Fragment() {
             false
         )
 
-        imgMeal = view.findViewById(R.id.imgRecipe)
-        txtName = view.findViewById(R.id.txtRecipeName)
-        txtInstructions = view.findViewById(R.id.txtInstructions)
+        imgMeal =
+            view.findViewById(R.id.imgRecipe)
+
+        txtName =
+            view.findViewById(R.id.txtRecipeName)
+
+        txtInstructions =
+            view.findViewById(R.id.txtInstructions)
 
         youtubePlayerView =
             view.findViewById(R.id.youtubePlayerView)
@@ -62,115 +64,125 @@ class DetailsFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
-        lifecycle.addObserver(youtubePlayerView)
+        lifecycle.addObserver(
+            youtubePlayerView
+        )
+
+        val repository =
+            RepositoryProvider.provideRepository(
+                requireContext()
+            )
+
+        val factory =
+            ViewModelFactory(repository)
 
         viewModel =
-            ViewModelProvider(this)[DetailsViewModel::class.java]
+            ViewModelProvider(
+                this,
+                factory
+            )[DetailsViewModel::class.java]
 
-        favoriteViewModel =
-            ViewModelProvider(this)[FavoriteViewModel::class.java]
+        return view
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?
+    ) {
+        super.onViewCreated(
+            view,
+            savedInstanceState
+        )
 
         val mealId =
             arguments?.getString("id") ?: ""
+
+        observeMeal()
+        observeFavorite()
 
         if (mealId.isNotEmpty()) {
             viewModel.loadMeal(mealId)
         }
 
-        viewModel.meal.observe(viewLifecycleOwner) { meal ->
+        btnFavorite.setOnClickListener {
+            viewModel.toggleFavorite()
+        }
+    }
 
-            // Recipe information
-            txtName.text = meal.strMeal
+    private fun observeMeal() {
+
+        viewModel.meal.observe(
+            viewLifecycleOwner
+        ) { meal ->
+
+            if (meal == null) return@observe
+            viewModel.addToRecent(meal)
+
+            txtName.text =
+                meal.strMeal
 
             txtInstructions.text =
                 meal.strInstructions
                     ?: "No instructions available"
 
-            // Recipe image
             Glide.with(requireContext())
                 .load(meal.strMealThumb)
-                .placeholder(R.drawable.banner_food)
+                .placeholder(
+                    R.drawable.banner_food
+                )
                 .into(imgMeal)
 
-            // Check if recipe is favorite
-            favoriteViewModel
-                .isFavorite(meal.idMeal)
-                .observe(viewLifecycleOwner) { favorite ->
+            setupYoutube(
+                meal.strYoutube
+            )
+        }
+    }
 
-                    isFavorite = favorite
+    private fun observeFavorite() {
 
-                    if (favorite) {
+        viewModel.isFavorite.observe(
+            viewLifecycleOwner
+        ) { favorite ->
 
-                        btnFavorite.setImageResource(
-                            R.drawable.ic_favorite
-                        )
+            if (favorite) {
 
-                    } else {
+                btnFavorite.setImageResource(
+                    R.drawable.ic_favorite
+                )
 
-                        btnFavorite.setImageResource(
-                            R.drawable.ic_favorite_border
+            } else {
+
+                btnFavorite.setImageResource(
+                    R.drawable.ic_favorite_border
+                )
+            }
+        }
+    }
+
+    private fun setupYoutube(url: String?) {
+
+        if (url.isNullOrEmpty()) return
+
+        val videoId =
+            getYoutubeVideoId(url)
+
+        if (videoId.isEmpty()) return
+
+        youtubePlayerView
+            .addYouTubePlayerListener(
+                object : AbstractYouTubePlayerListener() {
+
+                    override fun onReady(
+                        youTubePlayer: YouTubePlayer
+                    ) {
+
+                        youTubePlayer.cueVideo(
+                            videoId,
+                            0f
                         )
                     }
                 }
-
-            // Favorite button
-            btnFavorite.setOnClickListener {
-
-                val favoriteMeal = FavoriteMeal(
-                    idMeal = meal.idMeal,
-                    strMeal = meal.strMeal,
-                    strCategory = meal.strCategory,
-                    strArea = meal.strArea,
-                    strInstructions = meal.strInstructions,
-                    strMealThumb = meal.strMealThumb,
-                    strYoutube = meal.strYoutube
-                )
-
-                if (isFavorite) {
-
-                    favoriteViewModel.removeFavoriteById(
-                        meal.idMeal
-                    )
-
-                } else {
-
-                    favoriteViewModel.addFavorite(
-                        favoriteMeal
-                    )
-                }
-            }
-
-            // YouTube
-            val youtubeUrl = meal.strYoutube
-
-            if (!youtubeUrl.isNullOrEmpty()) {
-
-                val videoId =
-                    getYoutubeVideoId(youtubeUrl)
-
-                if (videoId.isNotEmpty()) {
-
-                    youtubePlayerView
-                        .addYouTubePlayerListener(
-                            object :
-                                AbstractYouTubePlayerListener() {
-
-                                override fun onReady(
-                                    youTubePlayer: YouTubePlayer
-                                ) {
-
-                                    youTubePlayer.cueVideo(
-                                        videoId,
-                                        0f
-                                    )
-                                }
-                            }
-                        )
-                }
-            }
-        }
-
-        return view
+            )
     }
 
     private fun getYoutubeVideoId(
@@ -184,7 +196,9 @@ class DetailsFragment : Fragment() {
                 url.substringAfter("v=")
                     .substringBefore("&")
 
-            } else if (url.contains("youtu.be/")) {
+            } else if (
+                url.contains("youtu.be/")
+            ) {
 
                 url.substringAfter("youtu.be/")
                     .substringBefore("?")
@@ -192,11 +206,13 @@ class DetailsFragment : Fragment() {
             } else {
 
                 ""
+
             }
 
         } catch (e: Exception) {
 
             ""
+
         }
     }
 
@@ -216,14 +232,16 @@ class DetailsFragment : Fragment() {
             val fragment =
                 DetailsFragment()
 
-            val bundle = Bundle()
+            val bundle =
+                Bundle()
 
             bundle.putString(
                 "id",
                 id
             )
 
-            fragment.arguments = bundle
+            fragment.arguments =
+                bundle
 
             return fragment
         }
