@@ -18,7 +18,7 @@ import com.example.recipe_browser.model.local.entities.SearchHistoryEntity
         SearchHistoryEntity::class,
         RecentRecipeEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class RecipeDatabase : RoomDatabase() {
@@ -39,7 +39,9 @@ abstract class RecipeDatabase : RoomDatabase() {
                     context.applicationContext,
                     RecipeDatabase::class.java,
                     "recipe_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
 
                 INSTANCE = instance
                 instance

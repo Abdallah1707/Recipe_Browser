@@ -11,29 +11,29 @@ import com.bumptech.glide.Glide
 import com.example.recipe_browser.R
 import com.example.recipe_browser.model.Meal
 
-class MealAdapter(
+class PopularMealAdapter(
     private val meals: List<Meal>,
     private val onClick: (Meal) -> Unit
-) : RecyclerView.Adapter<MealAdapter.MealViewHolder>() {
+) : RecyclerView.Adapter<PopularMealAdapter.PopularMealViewHolder>() {
 
-    class MealViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class PopularMealViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val imgRecipe: ImageView = itemView.findViewById(R.id.imgRecent)
-        val txtRecipeName: TextView = itemView.findViewById(R.id.txtRecentName)
-        val txtTime: TextView = itemView.findViewById(R.id.txtRecentTime)
+        val imgRecipe: ImageView = itemView.findViewById(R.id.imgRecipe)
+        val txtRecipeName: TextView = itemView.findViewById(R.id.txtRecipeName)
+        val txtTime: TextView = itemView.findViewById(R.id.txtRecipeName)
         val ratingBar: RatingBar = itemView.findViewById(R.id.ratingBar)
 
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MealViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopularMealViewHolder {
 
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_recent_recipe, parent, false)
+            .inflate(R.layout.item_popular_recipe, parent, false)
 
-        return MealViewHolder(view)
+        return PopularMealViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: MealViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: PopularMealViewHolder, position: Int) {
 
         val meal = meals[position]
 

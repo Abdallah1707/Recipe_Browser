@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
 import com.example.recipe_browser.adapter.CategoryAdapter
-import com.example.recipe_browser.adapter.MealAdapter
+import com.example.recipe_browser.adapter.PopularMealAdapter
 import com.example.recipe_browser.adapter.RecentHomeAdapter
 import com.example.recipe_browser.model.RepositoryProvider
 import com.example.recipe_browser.viewmodel.HomeViewModel
@@ -130,7 +130,7 @@ class HomeFragment : Fragment() {
 
         viewModel.meals.observe(viewLifecycleOwner) { meals ->
 
-            popularRecycler.adapter = MealAdapter(meals) { meal ->
+            popularRecycler.adapter = PopularMealAdapter(meals) { meal ->
 
                 parentFragmentManager.beginTransaction()
                     .replace(

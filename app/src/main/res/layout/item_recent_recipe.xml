@@ -46,6 +46,16 @@
                 android:text="45 min"
                 android:textColor="#777777"/>
 
+            <RatingBar
+                android:id="@+id/ratingBar"
+                style="?android:attr/ratingBarStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:numStars="5"
+                android:rating="4.5"
+                android:stepSize="0.5"/>
+
         </LinearLayout>
 
         <ImageButton

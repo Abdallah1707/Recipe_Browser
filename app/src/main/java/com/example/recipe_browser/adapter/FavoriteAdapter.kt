@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,6 +28,9 @@ class FavoriteAdapter(
 
         val txtRecentTime: TextView =
             itemView.findViewById(R.id.txtRecentTime)
+
+        val ratingBar: RatingBar =
+            itemView.findViewById(R.id.ratingBar)
 
         val btnFavorite: ImageButton =
             itemView.findViewById(R.id.btnFavorite)
@@ -65,6 +69,11 @@ class FavoriteAdapter(
             .placeholder(R.drawable.banner_food)
             .into(holder.imgRecent)
 
+        holder.ratingBar.rating = 4.5f
+
+        holder.itemView.setOnClickListener {
+            onClick(meal)
+        }
         holder.btnFavorite.setImageResource(
             R.drawable.ic_favorite
         )
