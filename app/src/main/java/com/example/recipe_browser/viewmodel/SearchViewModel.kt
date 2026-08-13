@@ -91,4 +91,20 @@ class SearchViewModel(
             }
         }
     }
+    fun clearSearchHistory() {
+
+        viewModelScope.launch {
+
+            try {
+
+                repository.clearSearchHistory()
+                loadSearchHistory()
+
+            } catch (e: Exception) {
+
+                e.printStackTrace()
+
+            }
+        }
+    }
 }
