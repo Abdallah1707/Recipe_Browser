@@ -7,7 +7,7 @@ import com.example.recipe_browser.fragments.LoginFragment
 import com.example.recipe_browser.fragments.SplashFragment
 
 class AuthActivity : AppCompatActivity(), SplashFragment.SplashListener {
-
+    //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
