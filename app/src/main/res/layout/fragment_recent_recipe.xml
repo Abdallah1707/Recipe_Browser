@@ -14,13 +14,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Categories"
+        android:text="Recent Recipes"
         android:textColor="#222222"
         android:textSize="34sp"
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_CategoriesFrag"
+        android:id="@+id/rv_RecentFrag"
         android:layout_width="match_parent"
         android:layout_height="603dp"
         android:layout_weight="1"

@@ -1,5 +1,6 @@
 package com.example.recipe_browser.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.recipe_browser.R
@@ -16,10 +18,12 @@ import com.example.recipe_browser.adapter.CategoryAdapter
 import com.example.recipe_browser.adapter.PopularMealAdapter
 import com.example.recipe_browser.adapter.RecentHomeAdapter
 import com.example.recipe_browser.model.RepositoryProvider
+import com.example.recipe_browser.room.MealDatabase
 import com.example.recipe_browser.viewmodel.HomeViewModel
 import com.example.recipe_browser.viewmodel.RecentViewModel
 import com.example.recipe_browser.viewmodel.ViewModelFactory
 import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -56,6 +60,8 @@ class HomeFragment : Fragment() {
 
         val imgProfile = view.findViewById<ImageView>(R.id.imgProfileToolbar)
 
+        val txtHello = view.findViewById<TextView>(R.id.txtHello)
+
         val etSearch = view.findViewById<TextInputEditText>(R.id.etSearch)
         etSearch.isFocusable = false
         etSearch.isClickable = true
@@ -65,12 +71,30 @@ class HomeFragment : Fragment() {
         val bannerCard = view.findViewById<androidx.cardview.widget.CardView>(R.id.bannerCard)
 
         val txtSeeAllCategories = view.findViewById<TextView>(R.id.txtSeeAllCategories)
-        val txtSeeAllPopular = view.findViewById<TextView>(R.id.txtSeeAllPopular)
         val txtSeeAllRecent = view.findViewById<TextView>(R.id.txtSeeAllRecent)
 
         popularRecycler = view.findViewById(R.id.rvPopular)
         categoryRecycler = view.findViewById(R.id.rvCategories)
         recentRecycler = view.findViewById(R.id.rvRecent)
+
+
+        val sharedPref = requireActivity().getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+        val userEmail = sharedPref.getString("userEmail", null)
+
+        if (userEmail != null) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val db = MealDatabase.getDatabase(requireContext())
+                val user = db.userDao().getUserByEmail(userEmail)
+
+                txtHello.text = if (user != null) {
+                    "Hello, ${user.name} 👋"
+                } else {
+                    "Hello, 👋"
+                }
+            }
+        } else {
+            txtHello.text = "Hello, 👋"
+        }
 
         recentRecycler.layoutManager =
             LinearLayoutManager(
@@ -122,19 +146,14 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        txtSeeAllPopular.setOnClickListener {
+
+
+        txtSeeAllRecent.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, SearchFragment())
+                .replace(R.id.fragmentContainer, RecentRecipeFragment())
                 .addToBackStack(null)
                 .commit()
         }
-
-//        txtSeeAllRecent.setOnClickListener {
-//            parentFragmentManager.beginTransaction()
-//                .replace(R.id.fragmentContainer, RecentFragment()) // create this if it doesn't exist yet
-//                .addToBackStack(null)
-//                .commit()
-//        }
 
         viewModel.randomMeal.observe(viewLifecycleOwner) { meal ->
             if (meal == null) return@observe

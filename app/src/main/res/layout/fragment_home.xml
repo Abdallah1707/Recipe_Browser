@@ -208,7 +208,8 @@
                     android:layout_height="wrap_content"
                     android:text="See All"
                     android:textColor="#4CAF50"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
