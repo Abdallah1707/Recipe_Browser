@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ImageView
+import android.widget.TextView
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -94,6 +95,13 @@ class SearchFragment : Fragment() {
         observeSearchHistory()
         viewModel.loadSearchHistory()
 
+        val btnClearSearches =
+            view.findViewById<TextView>(R.id.btnClearSearches)
+
+        btnClearSearches.setOnClickListener {
+            viewModel.clearSearchHistory()
+        }
+
         etSearch.setOnEditorActionListener { _, actionId, _ ->
 
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -145,10 +153,31 @@ class SearchFragment : Fragment() {
                         keyword.length
                     )
 
-                    viewModel.searchMeal(
-                        keyword
-                    )
+                    viewModel.searchMeal(keyword)
                 }
+
+            val tvRecentSearches =
+                view?.findViewById<TextView>(
+                    R.id.tvRecentSearches
+                )
+
+            val btnClearSearches =
+                view?.findViewById<TextView>(
+                    R.id.btnClearSearches
+                )
+
+            if (history.isEmpty()) {
+
+                tvRecentSearches?.visibility = View.GONE
+                btnClearSearches?.visibility = View.GONE
+                historyRecyclerView.visibility = View.GONE
+
+            } else {
+
+                tvRecentSearches?.visibility = View.VISIBLE
+                btnClearSearches?.visibility = View.VISIBLE
+                historyRecyclerView.visibility = View.VISIBLE
+            }
         }
     }
 

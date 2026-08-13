@@ -70,15 +70,36 @@
 
 
         <!-- Recent Searches Title -->
-        <TextView
-            android:id="@+id/tvRecentSearches"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:text="Recent Searches"
-            android:textColor="#222222"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvRecentSearches"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Recent Searches"
+                android:textColor="#222222"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/btnClearSearches"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"
+                android:text="Clear All"
+                android:textColor="#7B4BE2"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
 
         <!-- Recent Searches -->

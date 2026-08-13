@@ -55,6 +55,9 @@ class RecipeRepository(
     suspend fun getSearchHistory(): List<SearchHistoryEntity> {
         return searchHistoryDao.getAllSearchHistory()
     }
+    suspend fun clearSearchHistory() {
+        searchHistoryDao.deleteAll()
+    }
 //    suspend fun insertSearch(search: SearchHistoryEntity) {
 //        searchHistoryDao.insertSearch(search)
 //    }
