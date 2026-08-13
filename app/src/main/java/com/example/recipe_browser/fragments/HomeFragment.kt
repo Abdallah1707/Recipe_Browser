@@ -64,6 +64,10 @@ class HomeFragment : Fragment() {
         val txtBannerSubtitle = view.findViewById<TextView>(R.id.tv_BannerSubtitle)
         val bannerCard = view.findViewById<androidx.cardview.widget.CardView>(R.id.bannerCard)
 
+        val txtSeeAllCategories = view.findViewById<TextView>(R.id.txtSeeAllCategories)
+        val txtSeeAllPopular = view.findViewById<TextView>(R.id.txtSeeAllPopular)
+        val txtSeeAllRecent = view.findViewById<TextView>(R.id.txtSeeAllRecent)
+
         popularRecycler = view.findViewById(R.id.rvPopular)
         categoryRecycler = view.findViewById(R.id.rvCategories)
         recentRecycler = view.findViewById(R.id.rvRecent)
@@ -110,6 +114,27 @@ class HomeFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
+
+        txtSeeAllCategories.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, CategoryFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        txtSeeAllPopular.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, SearchFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+//        txtSeeAllRecent.setOnClickListener {
+//            parentFragmentManager.beginTransaction()
+//                .replace(R.id.fragmentContainer, RecentFragment()) // create this if it doesn't exist yet
+//                .addToBackStack(null)
+//                .commit()
+//        }
 
         viewModel.randomMeal.observe(viewLifecycleOwner) { meal ->
             if (meal == null) return@observe

@@ -29,6 +29,9 @@ class ViewModelFactory(
             modelClass.isAssignableFrom(RecentViewModel::class.java) ->
                 RecentViewModel(repository) as T
 
+            modelClass.isAssignableFrom(CategoryViewModel::class.java) ->
+                CategoryViewModel(repository) as T
+
             else ->
                 throw IllegalArgumentException(
                     "Unknown ViewModel class: ${modelClass.name}"
